@@ -1,3 +1,37 @@
+library(MASS)
+View(Boston)
+library(tree)
+# traing and testing tree 
+training<-sample(1:nrow(Boston),nrow(Boston)/2)
+tree.boston<-tree(medv~.,Boston,subset=training)
+summary(tree.boston)
+plot(tree.boston)
+text(tree.boston,pretty = 0)
+
+# test MSE 
+B.pre<-predict(tree.boston,newdata = Boston[-training,])
+B.test<-Boston[-training,'medv']
+mean((B.pre-B.test)^2)
+
+
+#doing the cv k fold 
+cv.B<-cv.tree(tree.boston)
+plot(cv.B$size,cv.B$dev,type = 'b')
+
+#prune the tree 
+B.p<-prune.tree(tree.boston,best=7)
+plot(B.p)
+text(B.p,pretty=0)
+
+#reC 
+yhat<-predict(B.p,newdata = Boston[-training,])
+B.t<-Boston[-training,'medv']
+plot(yhat,B.t)
+install.packages('obline')
+obline(0,1)
+mean((yhat-B.t)^2)
+
+#MSE imporve 
 .Rproj.user
 .Rhistory
 .RData
