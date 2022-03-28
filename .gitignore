@@ -32,6 +32,48 @@ obline(0,1)
 mean((yhat-B.t)^2)
 
 #MSE imporve 
+
+
+
+#bagging
+library('randomForest')
+installed.packages('randomForest')
+install.packages('randomForest')
+library(MASS)
+View(Boston)
+set.seed(1)
+B.b<-randomForest(medv~.,data = Boston,subset = training,mtry=13,importance=T)
+B.b
+
+#MSE
+yhat.bag<-predict(B.b,newdata = Boston[-training,])
+plot(yhat.bag,B.t)
+abline(0,1)
+mean((yhat.bag-B.t)^2)
+
+#importance plot
+importance(B.b)
+varImpPlot(B.b)
+
+#Boosting (build one by one )
+library(gbm)
+install.packages('gbm')
+set.seed(13)
+
+#bild model 
+boost.B<-gbm(medv~.,data=Boston[-training,],
+             n.trees=2000,distribution='gaussian',
+             interaction.depth=10)
+summary(boost.B)
+plot(boost.B)
+
+#got MSE
+yhat.boost<-predict(boost.B,newdata = Boston[-training,],
+                    n.trees = 2000)
+mean((yhat.boost-Boston[-training,]$medv)^2)
+
+
+
 .Rproj.user
 .Rhistory
 .RData
